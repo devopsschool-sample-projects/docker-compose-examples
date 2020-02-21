@@ -1,0 +1,8 @@
+server:
+  image: dockerepo/godep
+  ports:
+    - "10087:10086"
+  working_dir: /go/src/github.com/llitfkitfk/cirkol
+  tty: true
+  entrypoint: ""
+  command: sh -c "git clone https://github.com/CrawlApi/go-crawl.git . || git pull origin master && godep restore && go run apiServer.go"

@@ -1,0 +1,7 @@
+jenkins/data
+prometheus/
+cirkol/data/
+traefik/admin
+traefik/db
+traefik/log
+*.override.yml

@@ -1,0 +1,36 @@
+version: '2'
+services:
+  app:
+    image: tomcat:8.0-jre8
+    depends_on: 
+      - db
+    volumes:
+      - ../summer-web:/usr/local/tomcat/webapps/ROOT
+    labels:
+      - "traefik.port=8080"
+      - "traefik.backend=summer"
+      - "traefik.frontend.rule=Host:summer.l.wizmacau.com"
+    networks:
+      - web
+  java:
+    image: java:8-jdk
+    volumes:
+      - ../summer-web:/user/src/webapp
+      - ./command:/user/src/webapp/WEB-INF/classes/docker-command
+    working_dir: /user/src/webapp/WEB-INF/classes
+    command:
+      bash
+    #   ./docker-command/command.sh
+  db:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=summer
+      - MYSQL_DATABASE=summer03
+      - MYSQL_USER=summer
+      - MYSQL_PASSWORD=summer
+networks:
+  web:
+    external:
+      name: traefik_webgateway

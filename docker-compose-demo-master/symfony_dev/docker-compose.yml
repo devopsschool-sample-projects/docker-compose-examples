@@ -1,0 +1,37 @@
+db:
+  image: mysql
+  ports:
+    - 3306:3306
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: symfony
+    MYSQL_USER: root
+    MYSQL_PASSWORD: root
+app:
+  image: dockerepo/symfony
+  ports:
+    - 9000:9000
+  volumes:
+    - ./config/php70/symfony.ini:/usr/local/etc/php/conf.d/symfony.ini
+    - ./config/php70/php-fpm.conf:/usr/local/etc/php-fpm.conf
+    - /Users/llitfkitfk/Documents/git/app/symfony:/symfony
+  links:
+    - db
+nginx:
+  image: dockerepo/nginx
+  ports:
+    - 80:80
+  volumes:
+    - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf
+    - ./config/nginx/upstream.conf:/etc/nginx/conf.d/upstream.conf
+    - ./config/nginx/app.conf:/etc/nginx/conf.d/app.conf
+    - ./config/nginx/logs:/var/log/nginx
+  links:
+    - app
+composer:
+  image: dockerepo/composer
+  entrypoint: sh
+  stdin_open: true
+  tty: true
+  volumes:
+    - /Users/llitfkitfk/Documents/git/app/symfony:/app

@@ -1,0 +1,21 @@
+data:
+  image: gogs/gogs
+  entrypoint: /bin/true
+app:
+  image: gogs/gogs
+  volumes_from:
+    - data
+  ports:
+    - "10022:22"
+  links: 
+    - db
+  environment:
+    - VIRTUAL_HOST=gogit.darg.ws
+    - VIRTUAL_PORT=3000
+db:
+  image: mysql
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: symfony
+    MYSQL_USER: root
+    MYSQL_PASSWORD: root

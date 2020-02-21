@@ -1,0 +1,55 @@
+version: '2'
+
+services:
+  app:
+    image: traefik
+    command: --web --docker --docker.domain=gokit.info
+    restart: always
+    networks:
+      - webgateway
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
+  whoami:
+    image: emilevauge/whoami
+    networks:
+      - webgateway
+    labels:
+      - "traefik.backend=whoami"
+      - "traefik.frontend.rule=Host:whoami.gokit.info"
+  admin:
+    image: portainer/portainer
+    command: -H unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./admin/data:/data
+    labels:
+      - "traefik.port=9000"
+      - "traefik.backend=admin"
+      - "traefik.frontend.rule=Host:admin.gokit.info"
+    networks:
+      - webgateway
+  dash:
+    image: svendowideit/ambassador
+    links: 
+      - app
+    labels:
+      - "traefik.port=8080"
+      - "traefik.backend=dash"
+      - "traefik.frontend.rule=Host:dash.gokit.info"
+    environment: 
+      - DASH_PORT_8080_TCP=tcp://app:8080
+    networks:
+      - webgateway
+  db:
+    image: postgres:alpine
+    environment: 
+      - POSTGRES_PASSWORD=mysecretpassword
+    volumes:
+      - ./db/data:/var/lib/postgresql/data
+networks:
+  webgateway:
+    driver: bridge        
